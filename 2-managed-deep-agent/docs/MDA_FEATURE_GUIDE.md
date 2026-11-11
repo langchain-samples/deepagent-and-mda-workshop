@@ -31,6 +31,7 @@ The key difference from Part 1: `create_deep_agent()` returns a compiled agent t
 | [Human-in-the-loop](#8-human-in-the-loop) | `interrupt_on=` in `agent.py` | ➕ |
 | [Memory](#9-memory) | `memory.py` | ✅ |
 | [Sandbox](#10-sandbox) | `sandbox/__init__.py` (+ `setup.sh`) | ✅ |
+| [Browser use](#10b-browser-use) | `browser.py` (project root) | ✅ |
 | [Identity](#11-identity) | `identity.py` | ✅ |
 | [Connections](#12-connections) | `mda connections create` | ➕ |
 | [Slack](#13-slack-channel) | `channels/slack.py` | ✅ |
@@ -170,7 +171,27 @@ fact_checker = {
 }
 ```
 
-[Docs](https://docs.langchain.com/oss/python/deepagents/subagents)
+### Async subagents (SDK 0.10+)
+
+Add `"async": True` and the agent launches the subagent in the background with `start_async_task` instead of waiting on `task`. It keeps talking to the user, and the subagent reports back when it finishes (mid-run if the agent is busy, or by waking it with a new run if it's idle).
+
+```python
+deep_researcher = {
+    "name": "deep-researcher",
+    "description": "Runs a long, in-depth research job in the background...",
+    "system_prompt": "You are a thorough background researcher...",
+    "tools": [tavily_search],
+    "async": True,
+}
+```
+
+- Each async subagent is built as its own graph in the same deployment, e.g. `research-agent--deep-researcher`. Keep `name` and `async` literal: `mda` reads them from the file at build time.
+- Task tools: `start_async_task`, `check_async_task`, `update_async_task`, `cancel_async_task`, `list_async_tasks`.
+- It shares the agent's sandbox (same user) and the project's browser.
+- Options: `update_strategy` (`"interrupt"`/`"enqueue"`), `notify_parent`, `webhook`, `mode` (`"isolated"`/`"fork"`).
+- `mda eval` can't run agents that declare async subagents.
+
+[Docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-subagents#async-subagents)
 
 ## 8. Human-in-the-loop
 
@@ -223,6 +244,20 @@ sandbox = define_sandbox(
 - Your own tools can read and write sandbox files through `runtime.backend`.
 
 [Docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-sandboxes)
+
+## 10b. Browser use
+
+**File:** `browser.py` at the project root (not inside `browser/` or `sandbox/`). Added in SDK 0.10.
+
+```python
+from managed_deepagents import define_browser
+
+browser = define_browser(scope="thread", idle_ttl_seconds=600)
+```
+
+Adds `browser_snapshot`, `browser_run`, `browser_screenshot`, and `browser_handoff` (hand the window to a person for login, CAPTCHA, or 2FA; Studio shows an embedded browser with a **Hand back** button). `scope="user"` shares one browser and its logins across a signed-in user's threads. Screenshots saved to a path need the sandbox.
+
+[Docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-browser-use)
 
 ## 11. Identity
 
