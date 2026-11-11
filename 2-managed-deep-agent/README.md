@@ -12,7 +12,8 @@ Every file maps to one MDA feature. Open any of them: most are under 10 lines.
 
 ```
 2-managed-deep-agent/
-├── agent.py              # the agent: model, tools, middleware, subagent      (required)
+├── agent.py              # the agent: model, tools, middleware, subagents     (required)
+├── browser.py            # a managed browser the agent can drive (+ human handoff)
 ├── instructions.md       # system prompt (was AGENTS.md)
 ├── skills/               # LinkedIn + Twitter skills, loaded only when needed
 ├── tools/
@@ -44,7 +45,7 @@ Every file maps to one MDA feature. Open any of them: most are under 10 lines.
 | `StateBackend` scratch files | `sandbox/`: a real filesystem with a shell |
 | `FilesystemPermission` deny on `/skills/**` | Not needed: instructions and skills are read-only to the agent |
 | `langgraph.json` + deploy from GitHub | `uv run mda deploy` |
-| Not available | Slack (`channels/`), cron jobs (`schedules/`), MCP tools (`tools/mcp.py`), caller auth (`identity.py`) |
+| Not available | Slack (`channels/`), cron jobs (`schedules/`), MCP tools (`tools/mcp.py`), caller auth (`identity.py`), a managed browser (`browser.py`), async subagents (`"async": True`) |
 
 ## Prerequisites
 
@@ -111,6 +112,8 @@ When the deploy finishes, the CLI prints your deployment's URL in LangSmith. Ope
 |---|---|---|
 | **Skills** | "Write a Twitter thread about vector databases" | The agent reads `skills/twitter-post/SKILL.md` |
 | **Subagent** | "Write a fact-checked report on SASE" | A `task` tool call to `fact-checker` in the trace |
+| **Async subagent** | "In the background, do a deep dive on agent memory architectures. Meanwhile, tell me what SASE is." | `start_async_task` to `deep-researcher`; the agent answers you, then reports the deep dive when it finishes |
+| **Browser use** | "Open docs.langchain.com and summarize the Managed Deep Agents overview page" | `browser_run` / `browser_snapshot` calls; ask it to log in somewhere to see `browser_handoff` |
 | **Sandbox** | "Turn your report into HTML with pandoc" | `execute` calls; tools installed by `sandbox/setup.sh` |
 | **Agent memory** | In one thread: "Remember: always check official docs first." Then ask in a *new* thread how it researches | `/memories/agent/` in Context Hub, shared by everyone |
 | **User memory** | DM the agent in Slack: "I prefer short, punchy posts" | `/memories/user/`, private to you (Slack DMs and Studio) |
