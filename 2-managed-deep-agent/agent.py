@@ -39,7 +39,7 @@ deep_researcher = {
 
 agent = define_deep_agent(
     name="research-agent",
-    model="openai:gpt-6-luna",
+    model="openai:gpt-6.1-sol",
     tools=[tavily_search],
     middleware=[log_tool_calls, TodoListMiddleware()],  # TodoListMiddleware adds write_todos
     subagents=[fact_checker, deep_researcher],

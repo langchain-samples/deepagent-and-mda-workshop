@@ -51,7 +51,7 @@ You need a model that supports tool calling, plus that provider's API key.
 from deepagents import create_deep_agent
 
 agent = create_deep_agent(
-    model="openai:gpt-6-luna",
+    model="openai:gpt-6.1-sol",
     tools=[tavily_search],
     system_prompt="You are an expert research assistant.",
 )
@@ -88,7 +88,7 @@ Use a `"provider:model"` string, or build the model yourself for full control:
 
 ```python
 from langchain_openai import ChatOpenAI
-model = ChatOpenAI(model="gpt-6-luna")     # this project
+model = ChatOpenAI(model="gpt-6.1-sol")     # this project
 # or: model="anthropic:claude-sonnet-4-6", "google_genai:gemini-3.6-flash", ...
 ```
 
@@ -263,7 +263,7 @@ fact_checker = {
     "description": "Checks a draft report's claims against the web.",
     "system_prompt": "You are a meticulous fact-checker...",
     "tools": [tavily_search],
-    "model": "openai:gpt-6-luna",          # optional, defaults to the main model
+    "model": "openai:gpt-6.1-sol",          # optional, defaults to the main model
 }
 agent = create_deep_agent(..., subagents=[fact_checker])
 ```
@@ -419,7 +419,7 @@ Tune the harness for a specific model or provider, applied automatically wheneve
 ```python
 from deepagents import HarnessProfile, register_harness_profile
 
-register_harness_profile("openai:gpt-6-luna", HarnessProfile(system_prompt_suffix="Be concise."))
+register_harness_profile("openai:gpt-6.1-sol", HarnessProfile(system_prompt_suffix="Be concise."))
 ```
 
 `HarnessProfile` can also hide tools or middleware and disable the general-purpose subagent. `ProviderProfile` sets default model settings, such as temperature. Register profiles before creating the agent. [Docs](https://docs.langchain.com/oss/python/deepagents/profiles)

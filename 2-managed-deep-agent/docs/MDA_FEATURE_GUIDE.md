@@ -52,7 +52,7 @@ from managed_deepagents import define_deep_agent
 
 agent = define_deep_agent(
     name="research-agent",          # graph ID, deployment name, and the assistant_id clients use
-    model="openai:gpt-6-luna",      # "provider:model", or a LangChain chat model instance
+    model="openai:gpt-6.1-sol",      # "provider:model", or a LangChain chat model instance
     tools=[tavily_search],
     middleware=[log_tool_calls, TodoListMiddleware()],  # TodoListMiddleware adds write_todos
     subagents=[fact_checker],
